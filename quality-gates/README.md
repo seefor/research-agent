@@ -47,6 +47,43 @@ Rejected with no exceptions (per SOURCE-QUALITY.md):
 - LinkedIn posts/pulse, Twitter/X
 - Quora, Emergent Mind
 
+## persona-guard.py
+
+PreToolUse hook that prevents accidental custom persona destruction.
+
+**Problem:** `notebooklm configure --response-length longer` (without `--persona`) silently resets the chat goal from CUSTOM to DEFAULT, destroying the custom persona. Similarly, `--mode` switches override custom persona without warning. This is a bug in notebooklm-py <= 0.3.4 where `configure()` defaults to `ChatGoal.DEFAULT` when no explicit goal is provided, regardless of what's currently set on the server.
+
+**What it blocks:**
+- `notebooklm configure --response-length <value>` without `--persona`
+- `notebooklm configure --mode <value>` (warns that it will destroy custom persona)
+
+**What it allows:**
+- `notebooklm configure --persona "..." --response-length <value>` (safe)
+- `notebooklm configure --persona "..."` (safe)
+- Any non-configure notebooklm commands
+
+**Bypass:** `PERSONA_GUARD_OVERRIDE=1`
+
+```bash
+# Install as Claude Code PreToolUse hook (settings.json)
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/path/to/quality-gates/persona-guard.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Claude Code Integration
 
 For Claude Code users: a PreToolUse hook can block `notebooklm ask` commands unless the source audit has been completed and persona is configured. See the gate pattern in the Claude Code hooks documentation. The audit script writes the state that such a gate reads, keeping the gate fast (file read only, no network calls).
