@@ -85,17 +85,82 @@ You can seed the notebook with a context document (a design spec, architecture d
 
 This is declared in Phase 0 and propagates through the entire workflow.
 
-## Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-- [notebooklm-py](https://github.com/teng-lin/notebooklm-py): `pip install notebooklm-py`
-- NotebookLM authenticated: `notebooklm login`
+# Research Agent Skill Installation Guide
 
-## Install
+This guide walks you through installing the `research-agent` and `notebooklm` skills for Claude Code.
+
+## 1. Prerequisites
+
+Before installing, make sure you have the required CLI and Python dependencies ready.
+
+### Claude Code
+
+Make sure the Claude Code CLI tool is installed and working on your machine.
+
+### NotebookLM Python Library
+
+Install the required Python backend package:
 
 ```bash
+pip install notebooklm-py
+````
+
+### NotebookLM Authentication
+
+Log into your Google NotebookLM account from the terminal:
+
+```bash
+notebooklm login
+```
+
+---
+
+## 2. Comprehensive Installation Steps
+
+Because both macOS and Linux use Unix-based shells, the commands are the same for both operating systems.
+
+Open your terminal, navigate to your cloned `research-agent` directory, and run the following commands.
+
+```bash
+# 1. Create the target skill directories inside your Claude configuration
+mkdir -p ~/.claude/skills/research-agent/
+mkdir -p ~/.claude/skills/notebooklm/
+
+# 2. Copy the primary skill folders
 cp -r research-agent/ ~/.claude/skills/research-agent/
 cp -r notebooklm/ ~/.claude/skills/notebooklm/
+
+# 3. Copy the supporting architecture and validation folders into the research agent skill
+cp -r quality-gates/ ~/.claude/skills/research-agent/
+cp -r _design/ ~/.claude/skills/research-agent/
+```
+
+> **Note:**
+> If you pull updates from the repository in the future, re-run the `cp -r` commands above to overwrite your local files with the latest versions.
+
+---
+
+## 3. Verification and Usage
+
+The skills will automatically activate when you use research-focused prompts inside Claude Code.
+
+To test that everything is mapped correctly, open Claude Code and try prompts like:
+
+```text
+Research the current state of retrieval-augmented generation architectures
+```
+
+Or:
+
+```text
+Give me an implementation spec for vector similarity search with HNSW
+```
+
+Claude should start the workflow, run your target sources through the installed quality gates, and create a comprehensive Research Findings Document inside a local folder:
+
+```bash
+./research-findings/
 ```
 
 ## Usage
